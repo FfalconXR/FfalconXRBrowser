@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View"/>
+
+        <variable
+            name="historyViewModel"
+            type="com.igalia.wolvic.ui.viewmodel.HistoryViewModel" />
+
+        <variable
+            name="isAccountsUIEnabled"
+            type="boolean" />
+        <variable
+            name="isEmpty"
+            type="boolean" />
+
+        <variable
+            name="isSignedIn"
+            type="boolean" />
+
+        <variable
+            name="isSyncEnabled"
+            type="boolean" />
+
+        <variable
+            name="lastSync"
+            type="long" />
+
+        <variable
+            name="isSyncing"
+            type="boolean" />
+
+        <variable
+            name="callback"
+            type="com.igalia.wolvic.ui.callbacks.HistoryCallback" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/clearButton"
+            android:layout_width="100dp"
+            android:layout_height="34dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/rectangle_button_background"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:onClick="@{(view) ->  callback != null ? callback.onClearHistory(view) : void}"
+            android:padding="5dp"
+            android:paddingStart="10dp"
+            android:layout_marginEnd="51.5dp"
+            android:paddingEnd="10dp"
+            android:text="@string/history_clear"
+            android:textColor="#ff323c43"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:enabled="@{!isEmpty}"/>
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:gravity="left"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
+            android:layout_toStartOf="@id/clearButton"
+            android:textAlignment="gravity"
+            android:textColor="#ff323c43"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="20dp"
+            android:layout_below="@id/title"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="vertical"
+            app:visibleGone="@{!historyViewModel.isLoading &amp;&amp; historyViewModel.isEmpty}">
+
+            <ImageView
+                android:layout_width="@{historyViewModel.isNarrow ? @dimen/library_icon_size_narrow : @dimen/library_icon_size_wide, default=wrap_content}"
+                android:layout_height="@{historyViewModel.isNarrow ? @dimen/library_icon_size_narrow : @dimen/library_icon_size_wide, default=wrap_content}"
+                android:src="@drawable/ic_icon_history"
+                android:tint="@color/concrete"
+                app:srcCompat="@drawable/ic_icon_history" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="35dp"
+                android:fontFamily="sans-serif"
+                android:text="@string/history_empty"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textColor="#ff323c43"
+                android:textSize="@dimen/text_biggest_size"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="35dp"
+                android:fontFamily="sans-serif"
+                android:text="@string/history_description"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textColor="#b3323c43"
+                android:textSize="@dimen/text_medium_big_size"
+                android:textStyle="normal"
+                android:maxWidth="360dp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/loading_tv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/history_loading"
+            android:layout_centerInParent="true"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="@string/history_loading"
+            android:textAlignment="center"
+            android:textColor="@color/fog"
+            android:visibility="gone"
+            app:visibleGone="@{historyViewModel.isLoading}" />
+
+        <com.igalia.wolvic.ui.views.CustomRecyclerView
+            android:id="@+id/history_list"
+            style="@style/customRecyclerViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_below="@id/title"
+            android:layout_marginTop="25dp"
+            android:layout_above="@+id/header"
+            android:contentDescription="History feed"
+            android:fadingEdgeLength="60dp"
+            android:requiresFadingEdge="vertical"
+            app:layoutManager="com.igalia.wolvic.ui.adapters.CustomLinearLayoutManager"
+            app:visibleGone="@{!historyViewModel.isLoading &amp;&amp; !historyViewModel.isEmpty}" />
+
+        <FrameLayout
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true">
+            <include
+                android:id="@+id/history_narrow"
+                layout="@layout/history_narrow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:isAccountsUIEnabled="@{isAccountsUIEnabled}"
+                app:isEmpty="@{historyViewModel.isEmpty}"
+                app:isSignedIn="@{isSignedIn}"
+                app:isSyncEnabled="@{isSyncEnabled}"
+                app:lastSync="@{lastSync}"
+                app:isSyncing="@{isSyncing}"
+                app:isNarrow="@{historyViewModel.isNarrow}"
+                app:callback="@{callback}" />
+
+            <include
+                android:id="@+id/history_wide"
+                layout="@layout/history_wide"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:isAccountsUIEnabled="@{isAccountsUIEnabled}"
+                app:isEmpty="@{historyViewModel.isEmpty}"
+                app:isSignedIn="@{isSignedIn}"
+                app:isSyncEnabled="@{isSyncEnabled}"
+                app:lastSync="@{lastSync}"
+                app:isSyncing="@{isSyncing}"
+                app:isNarrow="@{historyViewModel.isNarrow}"
+                app:callback="@{callback}" />
+        </FrameLayout>
+    </RelativeLayout>
+</layout>

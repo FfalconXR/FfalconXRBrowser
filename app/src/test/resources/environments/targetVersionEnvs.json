@@ -1,0 +1,13 @@
+{
+  "1": {
+    "whatsNewUrl": "https://wolvic.com/",
+    "environments": [
+      {
+        "value": "wolvic",
+        "title": "Wolvic",
+        "thumbnail": "https://mixedreality.mozilla.org/FirefoxReality/envs/meadow/thumbnail.jpg",
+        "payload": "https://mixedreality.mozilla.org/FirefoxReality/envs/meadow/space.zip"
+      }
+    ]
+  }
+}

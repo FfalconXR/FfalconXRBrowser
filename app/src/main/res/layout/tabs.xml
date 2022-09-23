@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/window_background">
+    <com.igalia.wolvic.ui.views.UIButton
+        android:id="@+id/tabCloseButton"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="top|right"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="19dp"
+        android:src="@drawable/ic_tab_exit"
+        android:tint="@android:color/transparent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="35dp"
+        android:paddingEnd="35dp"
+        android:layout_marginStart="65dp"
+        android:layout_marginEnd="80dp"
+        android:layout_marginBottom="10dp">
+
+        <com.igalia.wolvic.ui.views.UIButton
+            android:id="@+id/tabsBackButton"
+            style="?attr/navigationBarButtonStyle"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="8dp"
+            android:visibility="gone"
+            android:src="@drawable/ic_icon_back"
+            android:tint="@color/midnight"/>
+
+        <TextView
+            android:id="@+id/tabsAvailableCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingStart="5dp"
+            android:textColor="#ff323c43"
+            android:paddingEnd="5dp"
+            android:textSize="17sp" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="100" />
+
+        <com.igalia.wolvic.ui.views.UITextButton
+            android:id="@+id/tabsSelectButton"
+            style="@style/tabsButton"
+            android:text="@string/tabs_select" />
+
+        <com.igalia.wolvic.ui.views.UITextButton
+            android:id="@+id/tabsDoneButton"
+            style="@style/tabsButton"
+            android:visibility="gone"
+            android:text="@string/tabs_select_done" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        style="?attr/separatorStyle"
+        android:layout_marginStart="35dp"
+        android:layout_marginEnd="35dp"
+        android:visibility="gone"
+        android:layout_marginTop="0dp"/>
+
+    <LinearLayout
+        android:id="@+id/tabsSelectModeView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="35dp"
+        android:paddingEnd="35dp"
+        android:layout_marginTop="10dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tabsSelectedCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textColor="@color/fog_blur"
+            android:shadowColor="#00000000"
+            android:textSize="22sp" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="100" />
+
+        <com.igalia.wolvic.ui.views.UITextButton
+            android:id="@+id/tabsCloseButton"
+            style="@style/tabsButton"
+            android:visibility="gone"
+            android:text="@string/tabs_close_selected" />
+
+        <com.igalia.wolvic.ui.views.UITextButton
+            android:id="@+id/tabsCloseAllButton"
+            style="@style/tabsButton"
+            android:text="@string/tabs_close_all" />
+
+        <com.igalia.wolvic.ui.views.UITextButton
+            android:id="@+id/tabsSelectAllButton"
+            style="@style/tabsButton"
+            android:text="@string/tabs_select_all" />
+
+        <com.igalia.wolvic.ui.views.UITextButton
+            android:id="@+id/tabsUnselectButton"
+            style="@style/tabsButton"
+            android:visibility="gone"
+            android:text="@string/tabs_unselect" />
+    </LinearLayout>
+
+    <com.igalia.wolvic.ui.views.CustomRecyclerView
+        android:id="@+id/tabsRecyclerView"
+        style="@style/customRecyclerViewStyle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:requiresFadingEdge="vertical"
+        android:overScrollMode="never"
+        android:layout_marginStart="135dp"
+        android:layout_marginEnd="135dp"
+        android:paddingStart="135dp"
+        android:paddingEnd="135dp"
+        android:layout_marginTop="29dp"
+        android:layout_marginBottom="10dp"
+        android:fadingEdgeLength="50dp">
+    </com.igalia.wolvic.ui.views.CustomRecyclerView>
+
+</LinearLayout>

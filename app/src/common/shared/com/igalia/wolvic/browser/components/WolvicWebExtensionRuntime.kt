@@ -1,0 +1,259 @@
+/* -*- Mode: Java; c-basic-offset: 4; tab-width: 4; indent-tabs-mode: nil; -*-
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+package com.igalia.wolvic.browser.components
+
+import android.content.Context
+import com.igalia.wolvic.browser.api.*
+import com.igalia.wolvic.browser.engine.Session
+import com.igalia.wolvic.browser.engine.SessionStore
+import com.igalia.wolvic.ui.widgets.WidgetManagerDelegate
+import mozilla.components.concept.engine.CancellableOperation
+import mozilla.components.concept.engine.Engine
+import mozilla.components.concept.engine.EngineSession
+import mozilla.components.concept.engine.webextension.*
+import mozilla.components.support.ktx.kotlin.isResourceUrl
+
+class WolvicWebExtensionRuntime(
+        private val context: Context,
+        private val runtime: WRuntime
+): WebExtensionRuntime {
+
+    private var webExtensionDelegate: WebExtensionDelegate? = null
+    private val webExtensionActionHandler = object : ActionHandler {
+        override fun onBrowserAction(extension: WebExtension, session: EngineSession?, action: Action) {
+            webExtensionDelegate?.onBrowserActionDefined(extension, action)
+        }
+
+        override fun onPageAction(extension: WebExtension, session: EngineSession?, action: Action) {
+            webExtensionDelegate?.onPageActionDefined(extension, action)
+        }
+
+        override fun onToggleActionPopup(extension: WebExtension, action: Action): EngineSession? {
+            val activeSession = SessionStore.get().activeSession
+            val session: Session = SessionStore.get().createWebExtensionSession(activeSession.isPrivateMode);
+            session.setParentSession(activeSession)
+            session.uaMode = WSessionSettings.USER_AGENT_MODE_DESKTOP
+            val engineSession = WolvicEngineSession(session)
+            (context as WidgetManagerDelegate).windows.onTabSelect(session)
+            return webExtensionDelegate?.onToggleActionPopup(extension, engineSession, action)
+        }
+    }
+    private val webExtensionTabHandler = object : TabHandler {
+        override fun onNewTab(webExtension: WebExtension, engineSession: EngineSession, active: Boolean, url: String) {
+            webExtensionDelegate?.onNewTab(webExtension, engineSession, active, url)
+        }
+    }
+
+    /**
+     * See [Engine.installWebExtension].
+     */
+    override fun installWebExtension(
+            id: String,
+            url: String,
+            onSuccess: ((WebExtension) -> Unit),
+            onError: ((String, Throwable) -> Unit)
+    ): CancellableOperation {
+
+        val onInstallSuccess: ((WebExtension) -> Unit) = {
+            webExtensionDelegate?.onInstalled(it)
+            it.registerActionHandler(webExtensionActionHandler)
+            it.registerTabHandler(webExtensionTabHandler)
+            onSuccess(it)
+        }
+
+        val result = if (url.isResourceUrl()) {
+            runtime.webExtensionController.ensureBuiltIn(url, id).apply {
+                then({
+                    onInstallSuccess(it!!)
+                    WResult.create<Void>()
+                }, { throwable ->
+                    onError(id, throwable)
+                    WResult.create<Void>()
+                })
+            }
+        } else {
+            runtime.webExtensionController.install(url).apply {
+                then({
+                    onInstallSuccess(it!!)
+                    WResult.create<Void>()
+                }, { throwable ->
+                    onError(id, throwable)
+                    WResult.create<Void>()
+                })
+            }
+        }
+        return result.asCancellableOperation()
+    }
+
+    /**
+     * See [Engine.uninstallWebExtension].
+     */
+    override fun uninstallWebExtension(
+            ext: WebExtension,
+            onSuccess: () -> Unit,
+            onError: (String, Throwable) -> Unit
+    ) {
+        runtime.webExtensionController.uninstall(ext).then({
+            webExtensionDelegate?.onUninstalled(ext)
+            onSuccess()
+            WResult.create<Void>()
+        }, { throwable ->
+            onError(ext.id, throwable)
+            WResult.create<Void>()
+        })
+    }
+
+    /**
+     * See [Engine.updateWebExtension].
+     */
+    override fun updateWebExtension(
+            extension: WebExtension,
+            onSuccess: (WebExtension?) -> Unit,
+            onError: (String, Throwable) -> Unit
+    ) {
+        runtime.webExtensionController.update(extension).then({ updatedExtension ->
+            if (updatedExtension != null) {
+                updatedExtension.registerActionHandler(webExtensionActionHandler)
+                updatedExtension.registerTabHandler(webExtensionTabHandler)
+            }
+            onSuccess(updatedExtension)
+            WResult.create<Void>()
+        }, { throwable ->
+            onError(extension.id, throwable)
+            WResult.create<Void>()
+        })
+    }
+
+    /**
+     * See [Engine.registerWebExtensionDelegate].
+     */
+    @Suppress("Deprecation")
+    override fun registerWebExtensionDelegate(
+            webExtensionDelegate: WebExtensionDelegate
+    ) {
+        this.webExtensionDelegate = webExtensionDelegate
+
+        val promptDelegate = object : WWebExtensionController.PromptDelegate {
+            override fun onInstallPrompt(extension: WebExtension): WResult<WAllowOrDeny>? {
+                return if (webExtensionDelegate.onInstallPermissionRequest(extension)) {
+                    WResult.allow()
+                } else {
+                    WResult.deny()
+                }
+            }
+
+            override fun onUpdatePrompt(
+                    current: WebExtension,
+                    updated: WebExtension,
+                    newPermissions: Array<out String>,
+                    newOrigins: Array<out String>
+            ): WResult<WAllowOrDeny>? {
+                // NB: We don't have a user flow for handling updated origins so we ignore them for now.
+                val result = WResult.create<WAllowOrDeny>()
+                webExtensionDelegate.onUpdatePermissionRequest(
+                        current,
+                        updated,
+                        newPermissions.toList()
+                ) {
+                    allow -> if (allow) result.complete(WAllowOrDeny.ALLOW) else result.complete(
+                    WAllowOrDeny.DENY)
+                }
+                return result
+            }
+        }
+
+        val debuggerDelegate = object : WWebExtensionController.DebuggerDelegate {
+            override fun onExtensionListUpdated() {
+                webExtensionDelegate.onExtensionListUpdated()
+            }
+        }
+
+        runtime.webExtensionController.promptDelegate = promptDelegate
+        runtime.webExtensionController.setDebuggerDelegate(debuggerDelegate)
+    }
+
+    /**
+     * See [Engine.listInstalledWebExtensions].
+     */
+    override fun listInstalledWebExtensions(onSuccess: (List<WebExtension>) -> Unit, onError: (Throwable) -> Unit) {
+        runtime.webExtensionController.list().then({
+            val extensions: List<WebExtension> = it ?: emptyList()
+
+            extensions.forEach { extension ->
+                extension.registerActionHandler(webExtensionActionHandler)
+                extension.registerTabHandler(webExtensionTabHandler)
+            }
+
+            onSuccess(extensions)
+            WResult.create<Void>()
+        }, { throwable ->
+            onError(throwable)
+            WResult.create<Void>()
+        })
+    }
+
+    /**
+     * See [Engine.enableWebExtension].
+     */
+    override fun enableWebExtension(
+            extension: WebExtension,
+            source: EnableSource,
+            onSuccess: (WebExtension) -> Unit,
+            onError: (Throwable) -> Unit
+    ) {
+        runtime.webExtensionController.enable(extension, source.id).then({
+            webExtensionDelegate?.onEnabled(extension)
+            onSuccess(extension)
+            WResult.create<Void>()
+        }, { throwable ->
+            onError(throwable)
+            WResult.create<Void>()
+        })
+    }
+
+    /**
+     * See [Engine.disableWebExtension].
+     */
+    override fun disableWebExtension(
+            extension: WebExtension,
+            source: EnableSource,
+            onSuccess: (WebExtension) -> Unit,
+            onError: (Throwable) -> Unit
+    ) {
+        runtime.webExtensionController.disable(extension, source.id).then({
+            webExtensionDelegate?.onDisabled(extension)
+            onSuccess(extension)
+            WResult.create<Void>()
+        }, { throwable ->
+            onError(throwable)
+            WResult.create<Void>()
+        })
+    }
+
+    /**
+     * See [Engine.setAllowedInPrivateBrowsing].
+     */
+    override fun setAllowedInPrivateBrowsing(
+            extension: WebExtension,
+            allowed: Boolean,
+            onSuccess: (WebExtension) -> Unit,
+            onError: (Throwable) -> Unit
+    ) {
+        runtime.webExtensionController.setAllowedInPrivateBrowsing(
+                extension,
+                allowed
+        ).then({
+            val ext = it!!
+            webExtensionDelegate?.onAllowedInPrivateBrowsingChanged(ext)
+            onSuccess(ext)
+            WResult.create<Void>()
+        }, { throwable ->
+            onError(throwable)
+            WResult.create<Void>()
+        })
+    }
+
+}

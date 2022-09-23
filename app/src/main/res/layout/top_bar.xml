@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="com.igalia.wolvic.ui.widgets.Windows.WindowPlacement"/>
+        <variable
+            name="viewmodel"
+            type="com.igalia.wolvic.ui.viewmodel.WindowViewModel" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center_horizontal"
+        app:visibleGone="@{viewmodel.isWindowVisible}">
+
+
+        <LinearLayout
+            android:id="@+id/multiWindowControlsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            app:visibleGone="@{!viewmodel.showClearButton}">
+
+            <com.igalia.wolvic.ui.views.UIButton
+                android:id="@+id/moveWindowLeftButton"
+                style="@style/uiButtonTheme"
+                android:background="@{viewmodel.isPrivateSession ? @drawable/fullscreen_button_private_first : @drawable/ic_window_left}"
+                android:src="@{viewmodel.isPrivateSession ? @drawable/ic_icon_window_write_left : @drawable/fullscreen_button_last}"
+                android:enabled="@{viewmodel.placement != WindowPlacement.LEFT}"
+                app:privateMode="@{viewmodel.isPrivateSession}"/>
+
+            <com.igalia.wolvic.ui.views.UIButton
+                android:id="@+id/closeWindowButton"
+                style="@style/uiButtonTheme"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@{viewmodel.isPrivateSession ? @drawable/fullscreen_button_private : @drawable/ic_window_exit}"
+                android:src="@{viewmodel.isPrivateSession ? @drawable/ic_icon_window_write_exit : @drawable/fullscreen_button_last}"
+                app:privateMode="@{viewmodel.isPrivateSession}"/>
+
+            <com.igalia.wolvic.ui.views.UIButton
+                android:id="@+id/moveWindowRightButton"
+                style="@style/uiButtonTheme"
+                android:background="@{viewmodel.isPrivateSession ? @drawable/fullscreen_button_private_last : @drawable/ic_window_right}"
+                android:src="@{viewmodel.isPrivateSession ? @drawable/ic_icon_window_write_right : @drawable/fullscreen_button_last}"
+                android:enabled="@{viewmodel.placement != WindowPlacement.RIGHT}"
+                app:privateMode="@{viewmodel.isPrivateSession}"/>
+        </LinearLayout>
+
+        <com.igalia.wolvic.ui.views.UITextButton
+            android:id="@+id/clearButton"
+            style="@style/textButtonTheme"
+            android:background="@drawable/text_button_private"
+            android:text="@string/private_clear_button"
+            android:textAllCaps="true"
+            android:textSize="@dimen/text_medium_big_size"
+            android:textColor="@color/fog"
+            app:visibleGone="@{viewmodel.showClearButton}" />
+
+    </FrameLayout>
+</layout>

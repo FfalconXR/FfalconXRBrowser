@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tool="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="viewmodel"
+            type="com.igalia.wolvic.ui.viewmodel.WindowViewModel" />
+        <variable
+            name="traymodel"
+            type="com.igalia.wolvic.ui.viewmodel.TrayViewModel" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="@dimen/tray_width"
+        android:layout_height="@dimen/tray_height"
+        android:background="@{viewmodel.isPrivateSession ? @drawable/window_navigation_private_mode_background: @drawable/window_navigation_background}"
+        android:gravity="top|center_horizontal"
+        >
+
+        <RelativeLayout
+            android:id="@+id/status_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_alignStart="@+id/tray_buttons"
+            android:layout_alignEnd="@+id/tray_buttons"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp">
+
+            <LinearLayout
+                android:id="@+id/time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/time_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{traymodel.time}"
+                    android:textColor="@{viewmodel.isPrivateSession ? @color/window_bg_color : @color/window_tabs_text_count}"
+                    android:textSize="@dimen/text_tary_size"
+                    android:tint="@color/concrete"
+                    tool:text="18:30" />
+
+                <TextView
+                    android:id="@+id/time_pm_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom"
+                    android:text="@{traymodel.pm}"
+                    android:textColor="@{viewmodel.isPrivateSession ? @color/window_bg_color: @color/concrete}"
+                    android:textSize="5sp"
+                    app:visibleGone="@{!traymodel.pm.isEmpty}"
+                    tool:text="pm" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/left_controller"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="12dp"
+                android:layout_toStartOf="@+id/right_controller"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/left_controller_icon"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:scaleType="fitCenter"
+                    android:src="@{traymodel.leftControllerIcon}"
+                    android:tint="@color/concrete" />
+
+                <ImageView
+                    android:id="@+id/left_controller_battery_indicator"
+                    android:layout_width="5dp"
+                    android:layout_height="12dp"
+                    android:scaleType="fitCenter"
+                    android:src="@{traymodel.leftControllerBatteryLevel}" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/right_controller"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="12dp"
+                android:layout_toStartOf="@+id/headset"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/right_controller_icon"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:scaleType="fitCenter"
+                    android:src="@{traymodel.rightControllerIcon}"
+                    android:tint="@color/concrete" />
+
+                <ImageView
+                    android:id="@+id/right_controller_battery_indicator"
+                    android:layout_width="5dp"
+                    android:layout_height="12dp"
+                    android:scaleType="fitCenter"
+                    android:src="@{traymodel.rightControllerBatteryLevel}" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/headset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="10dp"
+                android:visibility="gone"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/headset_icon"
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:scaleType="fitCenter"
+                    android:src="@{traymodel.headsetIcon}"
+                    android:tint="@color/concrete" />
+
+                <ImageView
+                    android:id="@+id/headset_battery_indicator"
+                    android:layout_width="5dp"
+                    android:layout_height="12dp"
+                    android:scaleType="fitCenter"
+                    android:src="@{traymodel.headsetBatteryLevel}" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/wifi"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="12dp">
+
+                <ImageView
+                    android:id="@+id/wifi_icon_background"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitCenter"
+                    android:src="@{traymodel.wifiConnected ? @drawable/ic_icon_statusbar_wifi_list : @drawable/ic_icon_statusbar_nowifi}"
+                    android:tint="@color/iron" />
+
+                <ImageView
+                    android:id="@+id/wifi_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_tray_wifi"
+                    android:tint="@color/concrete"
+                    app:visibleGone="@{traymodel.wifiConnected}" />
+            </FrameLayout>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/tray_buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6.5dp"
+            android:layout_below="@id/status_bar"
+            android:orientation="horizontal">
+
+            <com.igalia.wolvic.ui.views.UIButton
+                android:id="@+id/addwindowButton"
+                style="@style/trayButtonStartTheme"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_add_new_window"
+                android:text="add"
+                android:tooltipText="@string/new_window_tooltip"
+                app:tooltipDensity="@dimen/tray_tooltip_density"
+                app:tooltipLayout="@layout/tooltip_tray"
+                app:tooltipPosition="bottom"
+                app:visibleGone="@{!traymodel.isMaxWindows}" />
+
+            <com.igalia.wolvic.ui.views.UIButton
+                android:id="@+id/tabsButton"
+                style="@style/trayButtonMiddleTheme"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_icon_tray_tabs"
+                android:tooltipText="@string/tabs_tray_tooltip"
+                android:visibility="gone"
+                app:activeModeBackground="@{traymodel.isMaxWindows ? @drawable/tray_background_checked_start : @drawable/tray_background_checked_middle}"
+                app:privateModeBackground="@{traymodel.isMaxWindows ? @drawable/tray_background_start_private : @drawable/tray_background_middle_private}"
+                app:regularModeBackground="@{traymodel.isMaxWindows ? @drawable/tray_background_unchecked_start : @drawable/tray_background_unchecked_middle}"
+                app:tooltipDensity="@dimen/tray_tooltip_density"
+                app:tooltipLayout="@layout/tooltip_tray"
+                app:tooltipPosition="bottom" />
+
+            <com.igalia.wolvic.ui.views.UIButton
+                android:id="@+id/privateButton"
+                android:layout_weight="1"
+                style="@style/trayButtonMiddleTheme"
+                android:src="@drawable/ic_private_btn"
+                android:tooltipText="@{viewmodel.isPrivateSession? @string/private_browsing_exit_tooltip : @string/private_browsing_enter_tooltip}"
+                app:privateMode="@{viewmodel.isPrivateSession}"
+                app:tooltipDensity="@dimen/tray_tooltip_density"
+                app:tooltipLayout="@layout/tooltip_tray"
+                app:tooltipPosition="bottom" />
+
+
+                <com.igalia.wolvic.ui.views.UIButton
+                    android:id="@+id/libraryButton"
+                    style="@style/trayButtonMiddleTheme"
+                    android:src="@drawable/ic_bookmark_btn"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:tooltipText="@{viewmodel.isLibraryVisible ? @string/close_library_tooltip : @string/open_library_tooltip}"
+                    app:activeMode="@{viewmodel.isLibraryVisible}"
+                    app:clipDrawable="@drawable/ic_icon_library_clip"
+                    app:tooltipDensity="@dimen/tray_tooltip_density"
+                    app:tooltipLayout="@layout/tooltip_tray"
+                    app:tooltipPosition="bottom" />
+
+            <com.igalia.wolvic.ui.views.UIButton
+                android:id="@+id/settingsButton"
+                style="@style/trayButtonEndTheme"
+                android:layout_marginEnd="10dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_setting_btn"
+                android:tooltipText="@string/settings_tooltip"
+                app:tooltipDensity="@dimen/tray_tooltip_density"
+                app:tooltipLayout="@layout/tooltip_tray"
+                app:tooltipPosition="bottom" />
+        </LinearLayout>
+
+    </RelativeLayout>
+</layout>

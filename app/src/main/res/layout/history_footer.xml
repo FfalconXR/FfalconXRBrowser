@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" >
+
+    <data>
+        <variable
+            name="cancelClickListener"
+            type="android.view.View.OnClickListener" />
+        <variable
+            name="resetClickListener"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="30dp"
+        android:layout_marginStart="44dp"
+        android:layout_marginEnd="46dp"
+        android:gravity="center">
+
+        <View
+            android:id="@+id/separatorBottom"
+            style="?attr/separatorStyle"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_alignParentTop="true" />
+
+        <TextView
+            android:id="@+id/cancelButton"
+            style="@style/settingsCancelButton"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:focusable="true"
+            android:onClick="@{(view) ->  cancelClickListener.onClick(view)}"
+            tools:text="Button" />
+        <TextView
+            android:id="@+id/resetButton"
+            style="@style/settingsButton"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:onClick="@{(view) ->  resetClickListener.onClick(view)}"
+            android:focusable="true"
+            tools:text="Button" />
+
+<!--        <com.igalia.wolvic.ui.views.settings.ButtonSetting-->
+<!--            android:id="@+id/resetButton"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_marginEnd="46dp"-->
+<!--            android:layout_marginStart="20dp"-->
+<!--            android:visibility="gone"-->
+<!--            android:onClick="@{(view) ->  resetClickListener.onClick(view)}"-->
+<!--            android:paddingTop="10dp"-->
+<!--            android:paddingBottom="10dp" />-->
+
+
+    </RelativeLayout>
+</layout>

@@ -1,0 +1,4 @@
+<resources>
+    <string name="phone_tab_home" translatable="false">Home</string>
+    <string name="intent_scheme" translatable="false">ffalconbr</string>
+</resources>

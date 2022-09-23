@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape>
+            <corners android:radius="8dp" />
+            <stroke android:color="@color/white" android:width="1dp" />
+            <solid android:color="@color/navigation_bar_btn_bg" />
+        </shape>
+    </item>
+    <item android:state_hovered="true" android:state_pressed="false">
+        <shape>
+            <corners android:radius="8dp" />
+            <stroke android:color="@color/white" android:width="1dp" />
+            <solid android:color="@color/navigation_bar_btn_bg" />
+        </shape>
+    </item>
+    <item android:state_hovered="false" android:state_pressed="false">
+        <shape>
+            <corners android:radius="8dp" />
+            <stroke android:color="@color/navigation_bar_btn_bg" android:width="1dp" />
+            <solid android:color="@color/navigation_bar_btn_bg" />
+        </shape>
+    </item>
+</selector>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="com.igalia.wolvic.BuildConfig"/>
+        <variable
+            name="viewmodel"
+            type="com.igalia.wolvic.ui.viewmodel.WindowViewModel" />
+        <variable
+            name="settingsmodel"
+            type="com.igalia.wolvic.ui.viewmodel.SettingsViewModel" />
+    </data>
+    <LinearLayout
+        android:id="@+id/navigationBarContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:background="@{viewmodel.isPrivateSession ? @drawable/window_navigation_url_private_background: @drawable/window_navigation_background}"
+        android:orientation="horizontal"
+        android:padding="0dp">
+
+        <com.igalia.wolvic.ui.views.UIButton
+            android:id="@+id/backButton"
+            style="?attr/navigationBarButtonStyle"
+            android:src="@drawable/ic_back"
+            android:layout_weight="1"
+            android:tooltipText="@string/back_tooltip"
+            android:layout_marginStart="10dp"
+            android:enabled="@{viewmodel.canGoBack}"
+            app:privateMode="@{viewmodel.isPrivateSession}"/>
+
+        <com.igalia.wolvic.ui.views.UIButton
+            android:id="@+id/forwardButton"
+            style="?attr/navigationBarButtonStyle"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_forward"
+            android:tooltipText="@string/forward_tooltip"
+            android:enabled="@{viewmodel.canGoForward}"
+            app:privateMode="@{viewmodel.isPrivateSession}"/>
+
+        <com.igalia.wolvic.ui.views.UIButton
+            android:id="@+id/reloadButton"
+            style="?attr/navigationBarButtonStyle"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_reload"
+            android:tooltipText="@{viewmodel.isLoading ? @string/stop_tooltip : @string/refresh_tooltip}"
+            app:privateMode="@{viewmodel.isPrivateSession}"/>
+
+        <com.igalia.wolvic.ui.views.UIButton
+            android:id="@+id/homeButton"
+            style="?attr/navigationBarButtonStyle"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_navigation_home"
+            android:tooltipText="@string/home_tooltip"
+            app:privateMode="@{viewmodel.isPrivateSession}"/>
+
+        <com.igalia.wolvic.ui.views.NavigationURLBar
+            android:id="@+id/urlBar"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="20dp"
+            android:layout_weight="100"
+            android:orientation="horizontal"/>
+
+
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            android:layout_gravity="center_vertical"
+            app:visibleGone="@{settingsmodel.isWhatsNewVisible &amp;&amp; viewmodel.width > 640}">
+
+            <com.igalia.wolvic.ui.views.UIButton
+                android:id="@+id/whatsNew"
+                style="?attr/navigationBarButtonStyle"
+                android:src="@drawable/ic_whats_new"
+                android:visibility="gone"
+                android:tooltipText="@string/whats_new_tooltip"
+                app:privateMode="@{viewmodel.isPrivateSession}" />
+            <androidx.appcompat.widget.AppCompatTextView
+                android:layout_width="6dp"
+                android:layout_height="6dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginRight="10dp"
+                android:visibility="gone"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/downloads_badge"/>
+        </RelativeLayout>
+
+        <com.igalia.wolvic.ui.views.UIButton
+            android:id="@+id/bookmarkButton"
+            style="?attr/navigationBarButtonStyle"
+            android:src="@{viewmodel.isBookmarked ? @drawable/ic_navigation_add_bookmark : @drawable/ic_navigation_add_bookmark}"
+            android:layout_marginStart="20dp"
+            android:tooltipText="@{viewmodel.isBookmarked ? @string/remove_bookmark_tooltip : @string/bookmark_tooltip}"
+            app:privateMode="@{viewmodel.isPrivateSession}"
+            app:visibleGone="@{!(viewmodel.isLibraryVisible || viewmodel.isUrlEmpty) &amp;&amp; !viewmodel.isFocused}"
+            tools:src="@drawable/ic_navigation_add_bookmark" />
+
+        <com.igalia.wolvic.ui.views.UIButton
+            android:id="@+id/tabsButton"
+            style="?attr/navigationBarButtonStyle"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_navigation_tabs"
+            android:tooltipText="@string/tabs_tray_tooltip"
+             />
+
+        <com.igalia.wolvic.ui.views.UIButton
+            android:id="@+id/menuButton"
+            style="?attr/navigationBarButtonStyle"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/ic_navigation_setting"
+            android:tooltipText="@string/hamburger_menu_tooltip"
+            app:privateMode="@{viewmodel.isPrivateSession}"/>
+    </LinearLayout>
+</layout>
